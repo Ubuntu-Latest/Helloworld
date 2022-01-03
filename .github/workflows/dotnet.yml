@@ -28,6 +28,6 @@ jobs:
       uses: actions/download-artifact@v2.1.0
       with:
        # Artifact name
-       name: dotnet-helloworld
+       name: HelloWorld
        
     
