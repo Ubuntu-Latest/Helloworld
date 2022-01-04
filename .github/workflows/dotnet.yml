@@ -1,40 +1,25 @@
-name: Deploy ASP.NET Core app to Azure Web Appp
+name: .NEt
 
 on:
   push:
-    branches:
-      - master
-
-env:
-  AZURE_WEBAPP_NAME: dotnet-helloworld    # set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
-  DOTNET_VERSION: '5.0.x'           # set this to the dot net version to use
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
-  build-and-deploy:
-    runs-on: my-label
-    steps:
+  build:
 
-      # Checkout the repo
-      - uses: actions/checkout@master
-      
-      # Setup .NET Core SDK
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }} 
-      
-      # Run dotnet build and publish
-      - name: dotnet build and publish
-        run: |
-          dotnet restore
-          dotnet build --configuration Release
-          dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/Helloworld' 
-          
-      # Deploy to Azure Web apps
-      - name: 'Run Azure webapp deploy action using publish profile credentials'
-        uses: azure/webapps-deploy@v2
-        with: 
-          app-name: ${{ env.AZURE_WEBAPP_NAME }} # Replace with your app name
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE  }} # Define secret variable in repository settings as per action documentation
-          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/Helloworld'
+    runs-on: my-label
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
